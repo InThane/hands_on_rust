@@ -1,20 +1,53 @@
 #![warn(clippy::all, clippy::pedantic)]
 
-use bracket_lib::prelude::*;
+mod map;
+mod player;
 
-struct State {}
+mod prelude {
+    pub use bracket_lib::prelude::*;
+    pub const SCREEN_WIDTH: i32 = 80;
+    pub const SCREEN_HEIGHT:i32 = 50;
+    pub use crate::map::*;
+    pub use crate::player::*;
+    pub const MOVE_UP: Point = Point { x: 0, y: -1};
+    pub const MOVE_DOWN: Point = Point { x: 0, y: 1};
+    pub const MOVE_RIGHT: Point = Point { x: 1, y: 0};
+    pub const MOVE_LEFT: Point = Point { x: -1, y: 0};
+}
+
+use prelude::*;
+
+struct State {
+    map: Map,
+    player: Player,
+}
+
+impl State {
+    fn new() -> Self {
+        Self { 
+            map: Map::new(),
+            player: Player::new(
+                Point::new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+            ),
+        }
+    }
+}
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
-        ctx.print(1, 1, "Hello, bracket terminal!");
+        self.player.update(ctx, &self.map);
+        self.map.render(ctx);
+        self.player.render(ctx);
+
     }
 }
 
 fn main() -> BError {
     let context = BTermBuilder::simple80x50()
-    .with_title("Flappy Dragon")
+    .with_title("Rusty Rogue")
+    .with_fps_cap(30.0)
     .build()?;
 
-    main_loop(context, State{})
+    main_loop(context, State::new())
 }
