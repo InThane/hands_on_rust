@@ -29,8 +29,9 @@ pub fn spawn_monster(
                     1 => to_cp437('O'),
                     2 => to_cp437('o'),
                     _=> to_cp437('g'),
-                }
-            }
+                },
+            },
+            MovingRandomly{}
         )
     );
 }
